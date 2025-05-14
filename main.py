@@ -4,13 +4,13 @@ import logging
 import argparse
 
 
-class BasicBot:
-    def __init__(self, apikey, apisecret, testnet=True):
+class Bot:
+    def __init__(self, apikey, apisecret, testnet=True):    # initializing Object
         self.client = Client(apikey, apisecret)
         if testnet:
             self.client.FUTURES_URL = BASE_URL
 
-        logging.basicConfig(
+        logging.basicConfig(        # config log
             filename='trading_log.txt',
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s'
@@ -18,23 +18,23 @@ class BasicBot:
 
     def place_order(self, symbol, order_type, side, quantity, price=None, stop_price=None):
         try:
-            order_params = {
+            order_params = {        # parameters for order type MARKET
                 'symbol': symbol,
                 'type': order_type,
                 'side': side,
                 'quantity': float(quantity),
             }
 
-            if order_type == "LIMIT":
+            if order_type == "LIMIT":        # adding parameters is Order type is LIMIT
                 order_params['price'] = str(price)
                 order_params['timeInForce'] = TIME_IN_FORCE_GTC
 
-            elif order_type == "STOP_LIMIT":
+            elif order_type == "STOP_LIMIT":        # adding parameters is Order type is STOP_LIMIT
                 order_params['price'] = str(price)
                 order_params['stop_limit'] = str(stop_price)
                 order_params['timeInForce'] = TIME_IN_FORCE_GTC
 
-            elif order_type == "OCO":
+            elif order_type == "OCO":        # adding parameters is Order type is OCO
                 order_params['price'] = str(price)
                 order_params['stop_limit'] = str(stop_price)
                 order_params['limitClientOrderId'] = "uniqueOrderID"
@@ -42,7 +42,7 @@ class BasicBot:
 
             print(order_params)
 
-            order = self.client.futures_create_order(**order_params)
+            order = self.client.futures_create_order(**order_params)        # printing order details
             print("✅ Order placed!")
             print("Order ID:", order['orderId'])
             print("Status:", order['status'])
@@ -53,13 +53,13 @@ class BasicBot:
             print("Quantity:", order['origQty'])
 
             logging.info(f"Order successful: {order}")
-        except Exception as e:
+        except Exception as e:        # Exception for Error in getting Order info or in Accessing API
             print("❌ Error placing order.")
             print(str(e))
             logging.error(f"Order Failed: {str(e)}")
 
 
-def Accept_info():
+def Accept_info():        # getting information from user using CLI enhancement (Command line Interface)
     parser = argparse.ArgumentParser(description="Binance Trading Bot")
     parser.add_argument("symbol", type=str, help="The symbol for the trade (e.g. BTCUSDT)")
     parser.add_argument("order_type", type=str, choices=['LIMIT', 'STOP_LIMIT', 'OCO'], help="Type of the order")
@@ -73,12 +73,12 @@ def Accept_info():
 
 
 if __name__ == "__main__":
-    args = Accept_info()
+    args = Accept_info()    # Aruments from users
 
-    api_key = 'Cr85xFtUiGGTneezj67d6Gkzsf3Av5q1RsAABolWySyXIK9CiAX0RETQo3Zo9Hfp'
-    api_secret = 'O4GzO9QhkQhhylmrF3Ydni8qjzyIKMQulWVH887AtBZJWE6w2S1K1f8M73grdfiY'
+    api_key = 'Your Api Key'
+    api_secret = 'Your Api Secret'
 
     BASE_URL = 'https://testnet.binancefuture.com'
-    Bot = BasicBot(api_key, api_secret)
+    bot = Bot(api_key, api_secret)    # creating object from class Bot
 
-    Bot.place_order(args.symbol, args.order_type, args.side, args.quantity, args.price, args.stop_price)
+    bot.place_order(args.symbol, args.order_type, args.side, args.quantity, args.price, args.stop_price)
